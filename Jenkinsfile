@@ -23,29 +23,12 @@ pipeline {
                    '''
            }
         }
-/*        stage('CREATE ARTIFACT') {
-            steps {
-                echo 'Creating Docker Image...'
-                sh """#!/bin/bash -xe
-                     docker build . -t ${env.IMAGE_NAME} -f ${env.DOCKERFILE_NAME}
-                   """
-            }
-        }
-        stage('Push artifact to docker registry') {
-            steps {
-               withRegistry(credentialsID: 'dockerhub_id') {
-               sh """#!/bin/bash -xe
-                    
-                    docker push ${env.IMAGE_NAME}
-                    echo "Pushed Docker Image: ${env.IMAGE_NAME}"
-                  """
-               }
-            }
-        } */
-    stage('Push images') {
+
+    stage('Create and push image') {
        steps {
         script {
           def dockerImage = docker.build("${env.IMAGE_NAME}", "-f ${env.DOCKERFILE_NAME} .")
+           echo "Created Docker Image ${env.IMAGE_NAME}" 
            docker.withRegistry('', 'dockerhub_id') {
            dockerImage.push()
            dockerImage.push("latest")
